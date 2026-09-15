@@ -25,6 +25,8 @@ func worker(id int, jobs <-chan trabajo, results chan<- resultado, wg *sync.Wait
 	defer wg.Done()
 	for j := range jobs {
 		// TODO: procesar j (simular trabajo con Sleep)
+		time.Sleep(100 * time.Millisecond)
+		r := resultado{ID: j.ID, X: j.X, Procesado: j.X * j.X}
 
 		fmt.Printf("[worker %d] procesa trabajo %d -> %d\n", id, j.ID, r.Procesado)
 		results <- r
@@ -44,12 +46,13 @@ func main() {
 	// TODO: lanzar nWorkers workers
 	wg.Add(nWorkers)
 	for i := 1; i <= nWorkers; i++ {
-
+		go worker (i, jobs, results, &wg)
 	}
 
 	// TODO: productor de trabajos
 	go func() {
 		for i := 1; i <= nTrabajos; i++ {
+			jobs <- trabajo{ID: i, X: i}
 
 		}
 		close(jobs) // importante: cerrar para que los workers terminen
