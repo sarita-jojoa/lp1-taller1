@@ -18,6 +18,8 @@ type baseDatos struct {
 
 func (db *baseDatos) leer(clave string) (int, bool) {
 	// TODO: usar RLock/RUnlock (o Lock/Unlock si usas Mutex)
+	db.mu.RLock()
+	defer db.mu.RUnlock()
 
 	v, ok := db.m[clave]
 	return v, ok
@@ -25,6 +27,8 @@ func (db *baseDatos) leer(clave string) (int, bool) {
 
 func (db *baseDatos) escribir(clave string, valor int) {
 	// TODO: usar Lock/Unlock para escritura
+	db.mu.Lock()
+	defer db.mu.Unlock()
 
 	db.m[clave] = valor
 }
@@ -61,6 +65,7 @@ func main() {
 
 	// precarga
 	for _, k := range claves {
+		db.escribir(k, 0)
 
 	}
 
